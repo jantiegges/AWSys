@@ -46,13 +46,14 @@ body{
 #channels header{ /* Channels header */
     /*background-color: white; /*#C50E1F;
     /*color: black;*/
-    padding: 2rem 0;
+    padding: 1rem 0;
     background: #F8F8F8;
 }
 
 #channels header h1{
-    font-size: 5rem;
+    font-size: 4rem;
     font-weight: 100;
+    text-align: center;
 }
 
 #channels ul{
@@ -111,12 +112,13 @@ body{
 }
 
 #users header{
-    padding: 2rem 0;
+    padding: 1rem 0;
     background: #F8F8F8;
 }
 #users header h1{
-    font-size: 5rem;
+    font-size: 4rem;
     font-weight: 100;
+    text-align: center;
 }
 
 #users ul{
