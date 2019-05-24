@@ -1,3 +1,5 @@
 
 *.zip
 *.lnk
+.DS_Store
+.idea

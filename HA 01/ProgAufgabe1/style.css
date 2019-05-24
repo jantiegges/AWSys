@@ -1,3 +1,260 @@
-.active {
-    color: red;
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,400,700');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html{
+    font-family: "Roboto", sans-serif;
+    font-weight: 100;
+    font-size: 10px;
+}
+
+body{
+    /*background: #EEE;*/
+}
+
+#wrapper{
+    width: 100%;
+    height: 92.5vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    background-color: #D5E2E9;
+    /*color: #ff;*/
+}
+
+.container{
+    width: 70%;
+    height: 85%;
+    display: flex;
+    min-width: 80rem;
+    /*background-color: white;*/
+    justify-content: center;
+}
+
+/*#region Channels*/
+
+#channels {
+    background-color: #EEEEEE;
+    border-right: 1px solid rgba(0,0,0,0.3);
+}
+
+#channels header{ /* Channels header */
+    /*background-color: white; /*#C50E1F;
+    /*color: black;*/
+    padding: 2rem 0;
+    background: #F8F8F8;
+}
+
+#channels header h1{
+    font-size: 5rem;
+    font-weight: 100;
+}
+
+#channels ul{
+    list-style-type: none;
+}
+
+#channels ul li{
+    /*display: flex;
+    /*justify-content: space-between;
+    align-items: flex-start;*/
+
+    justify-content: center;
+    border-bottom: 1px solid rgba(0,0,0,0.3);
+    padding-bottom: 5px;
+}
+
+#channels .channel-name textarea{
+    flex-grow: 2;
+    resize: none;
+    border: none;
+    padding: 8px 0px 5px 10px; /* top, right, bottom, left */
+    height: 3rem;
+    border-radius: 20px;
+    background-color: white;
+    /*padding-top: 8px;
+    padding-left: 10px;
+    padding-bottom: 5px;*/
+}
+
+.channel-name{
+    font-size: 2.5rem;
+    margin-left: 5px;
+}
+
+.channel-list{
+    flex-grow: 2;
+    margin: auto 0;
+    min-width: 25rem;
+}
+
+.timestamp{
+    font-size: 1.5rem;
+    justify-content: right;
+    flex-grow: 0.3;
+    text-align: center;
+    /*margin-left: 8px;*/
+}
+
+/*#endregion Channels*/
+
+/*#region Users*/
+
+#users{
+    background-color: #EEEEEE;
+    border-right: 1px solid rgba(0,0,0,0.3);
+}
+
+#users header{
+    padding: 2rem 0;
+    background: #F8F8F8;
+}
+#users header h1{
+    font-size: 5rem;
+    font-weight: 100;
+}
+
+#users ul{
+    font-size: 1.8rem;
+    list-style-type: none;
+    margin-bottom: 20px;
+}
+
+#users ul li{
+    /*display: flex;
+    justify-content: space-between;
+    align-items: flex-start;*/
+
+    /*justify-content: center;*/
+    /*border-bottom: 1px solid rgba(0,0,0,0.3);*/
+    padding-left: 0.5rem;
+    padding-top: 0.5rem;
+    line-height: 3rem;
+}
+
+/*#users .user-name textarea{
+    flex-grow: 2;
+    resize: none;
+    border: none;
+    padding: 8px 0px 5px 10px; /* top, right, bottom, left */
+    /*height: 3rem;
+    border-radius: 20px;
+    background-color: white;*/
+    /*padding-top: 8px;
+    padding-left: 10px;
+    padding-bottom: 5px;
+}*/
+
+.channel-name{
+    font-size: 2.5rem;
+    margin-left: 5px;
+}
+
+.channel-list{
+    flex-grow: 2;
+    margin: auto 0;
+}
+
+/*#endregion users*/
+
+/*#region chat*/
+
+
+#chat-screen{
+    height: 100%;
+    min-width: 30rem;
+    background: #E5DDD5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 2;
+    color: #333;
+}
+
+#chat-screen .write-msg{
+    background-color: #EEEEEE;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    min-height: 5vh;
+}
+
+#chat-screen .write-msg textarea{
+    flex-grow: 2;
+    margin: 0 1rem;
+    resize: none;
+    border: none;
+    /*padding-top: 7px;
+    padding-left: 10px;*/
+    height: 3rem;
+    padding: 7px 0px 0px 10px; /* top, right, bottom, left */
+    border-radius: 20px;
+    background-color: white;
+}
+
+#chat-screen .write-msg textarea:focus {
+    outline: none;
+}
+
+/*#chat-screen .write-msg*/ i{
+    padding-top: 4px;
+    justify-content: center;
+    color: #CA362A;
+    cursor: pointer;
+}
+
+#messages{
+    overflow: auto;
+    flex-grow: 2;
+    padding: 1rem;
+}
+
+#messages article{
+    /* display "XY said:" next to actual message: */
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 2rem;
+}
+
+#messages article .user{
+    /* stuff for user "xy said:" */
+    margin-right: 1rem;
+}
+
+#messages .msg{
+    background-color: #fff;
+    width: 100%;
+    padding: 1.5rem 1rem;
+    border-radius: 0 4px 4px 4px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    text-align: left;
+    margin: auto 0;
+    font-size: 1.5rem;
+}
+/*#endregion chat*/
+
+a { /* set style of a-links */
+    text-decoration: none;
+    color: black;
+}
+
+.selected{ /* set style of selected channel */
+    font-weight: bold;
+}
+
+#header{ /* TU WhatsChat header */
+    background-color: #C50E1F;
+    color: white;
+    text-align: center;
+    font-size: 2rem;
+}
+
+#footer{ /* copyright footer */
+    font-size: 1.5rem;
+    text-align: center;
 }
