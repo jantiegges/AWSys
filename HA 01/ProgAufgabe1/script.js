@@ -67,6 +67,7 @@ $( document ).ready(function() {
     // set timers for background poll funcs
     setTimeout(_updateChannelList, g_iRefreshChannels);
     setTimeout(_updateMessageList, g_iRefreshMsgs);
+    // TODO: jede min check ob user offline
 });
 
 
