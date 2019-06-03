@@ -36,41 +36,26 @@ body{
     justify-content: center;
 }
 
-/*#region Channels*/
-
-#channels {
-    background-color: #EEEEEE;
-    border-right: 1px solid rgba(0,0,0,0.3);
+/*#chat-screen .write-msg*/ i{
+    padding-top: 0.5rem;
+    color: #CA362A;
+    cursor: pointer;
 }
 
-#channels header{ /* Channels header */
+header{ /* Channels + Users header */
     /*background-color: white; /*#C50E1F;
     /*color: black;*/
-    padding: 1rem 0;
+    padding: 0.2rem 0;
     background: #F8F8F8;
 }
 
-#channels header h1{
+header h1{ /* Channels + Users header */
     font-size: 4rem;
     font-weight: 100;
     text-align: center;
 }
 
-#channels ul{
-    list-style-type: none;
-}
-
-#channels ul li{
-    /*display: flex;
-    /*justify-content: space-between;
-    align-items: flex-start;*/
-
-    justify-content: center;
-    border-bottom: 1px solid rgba(0,0,0,0.3);
-    padding-bottom: 5px;
-}
-
-#channels .channel-name textarea{
+textarea {
     flex-grow: 2;
     resize: none;
     border: none;
@@ -78,28 +63,68 @@ body{
     height: 3rem;
     border-radius: 20px;
     background-color: white;
-    /*padding-top: 8px;
-    padding-left: 10px;
-    padding-bottom: 5px;*/
+    width: 90%;
+}
+
+/*#region Channels*/
+
+#channels {
+    background-color: #EEEEEE;
+    border-right: 1px solid rgba(0,0,0,0.3);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#channels ul{
+    list-style-type: none;
+}
+
+#channels ul li{
+    /*display: flex;*/
+    /*justify-content: space-between;*/
+    /*align-items: flex-start;*/
+    /*justify-content: center;*/
+    border-bottom: 1px solid rgba(0,0,0,0.3);
+    padding-bottom: 3px;
+}
+
+#channels ul li:first-child{
+    padding-top: 2px;
 }
 
 .channel-name{
     font-size: 2.5rem;
     margin-left: 5px;
-}
-
-.channel-list{
     flex-grow: 2;
-    margin: auto 0;
-    min-width: 25rem;
+    min-width: 15rem;
+    cursor: pointer;
 }
 
-.timestamp{
-    font-size: 1.5rem;
+.channel-name .selected {
+    font-weight: bolder;
+    color: #C50E1F;
+}
+
+
+#channels .channel-list .topic{
+    font-size: 1.3rem;
     justify-content: right;
     flex-grow: 0.3;
     text-align: center;
     /*margin-left: 8px;*/
+}
+
+#channels .topic textarea{
+    flex-grow: 2;
+    resize: none;
+    border: none;
+    /* top, right, bottom, left */
+    padding: 8px 0px 5px 10px;
+    height: 3rem;
+    border-radius: 20px;
+    background-color: white;
+    text-align: left;
+    justify-content: left;
 }
 
 /*#endregion Channels*/
@@ -111,10 +136,6 @@ body{
     border-right: 1px solid rgba(0,0,0,0.3);
 }
 
-#users header{
-    padding: 1rem 0;
-    background: #F8F8F8;
-}
 #users header h1{
     font-size: 4rem;
     font-weight: 100;
@@ -122,44 +143,44 @@ body{
 }
 
 #users ul{
-    font-size: 1.8rem;
     list-style-type: none;
-    margin-bottom: 20px;
 }
 
 #users ul li{
-    /*display: flex;
-    justify-content: space-between;
-    align-items: flex-start;*/
+    /*display: flex;*/
+    /*justify-content: space-between;*/
+    /*align-items: flex-start;*/
 
     /*justify-content: center;*/
     /*border-bottom: 1px solid rgba(0,0,0,0.3);*/
-    padding-left: 0.5rem;
-    padding-top: 0.5rem;
-    line-height: 3rem;
+    /*padding-left: 0.5rem;
+    /*padding-top: 0.3rem;*/
+    /*line-height: 3rem;*/
+    padding-bottom: 3px;
 }
 
-/*#users .user-name textarea{
-    flex-grow: 2;
-    resize: none;
-    border: none;
-    padding: 8px 0px 5px 10px; /* top, right, bottom, left */
-    /*height: 3rem;
-    border-radius: 20px;
-    background-color: white;*/
-    /*padding-top: 8px;
-    padding-left: 10px;
-    padding-bottom: 5px;
-}*/
+#users ul li:first-child{
+    border-bottom: 1px solid rgba(0,0,0,0.3);
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
 
-.channel-name{
-    font-size: 2.5rem;
+
+
+.user-name{
+    font-size: 1.5rem;
     margin-left: 5px;
+    /*margin-bottom: 0.0rem;*/
 }
 
-.channel-list{
+.user-list{
     flex-grow: 2;
     margin: auto 0;
+    min-width: 5rem;
+}
+
+#users .user-name i{
+    vertical-align: 0.4em;
 }
 
 /*#endregion users*/
@@ -176,6 +197,7 @@ body{
     justify-content: space-between;
     flex-grow: 2;
     color: #333;
+    max-width: 80rem;
 }
 
 #chat-screen .write-msg{
@@ -187,76 +209,104 @@ body{
 }
 
 #chat-screen .write-msg textarea{
-    flex-grow: 2;
+    /*flex-grow: 2;*/
     margin: 0 1rem;
-    resize: none;
-    border: none;
-    /*padding-top: 7px;
-    padding-left: 10px;*/
-    height: 3rem;
-    padding: 7px 0px 0px 10px; /* top, right, bottom, left */
-    border-radius: 20px;
-    background-color: white;
+    /*resize: none;*/
+    /*border: none;*/
+    /*padding-top: 7px;*/
+    /*padding-left: 10px;*/
+    /*height: 3rem;*/
+    /*padding: 7px 0px 0px 10px;*/
+    /*border-radius: 20px;*/
+    /*background-color: white;*/
 }
 
 #chat-screen .write-msg textarea:focus {
     outline: none;
 }
 
-/*#chat-screen .write-msg*/ i{
-    padding-top: 4px;
-    justify-content: center;
-    color: #CA362A;
-    cursor: pointer;
-}
-
 #messages{
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-word;
+    hyphens: auto;
     flex-grow: 2;
     padding: 1rem;
+    scroll-behavior: smooth;
 }
 
 #messages article{
-    /* display "XY said:" next to actual message: */
     display: flex;
     justify-content: flex-start;
     margin-bottom: 2rem;
+    /* set font size for msg and user */
+    font-size: 1.5rem;
 }
 
 #messages article .user{
-    /* stuff for user "xy said:" */
     margin-right: 1rem;
+    word-break: keep-all;
+    /*font-size: 1.5rem;*/
 }
 
-#messages .msg{
+#messages .msg {
+    /* white message background */
     background-color: #fff;
-    width: 100%;
-    padding: 1.5rem 1rem;
+    /*width: 100%;*/
+    padding: 0.5rem 1rem;
     border-radius: 0 4px 4px 4px;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
     text-align: left;
     margin: auto 0;
-    font-size: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    /*font-size: 1.5rem;*/
 }
+
+#messages .inner-msg{
+    /*background-color: #fff;*/
+    /*width: 100%;*/
+    /*padding: 1.5rem 1rem;*/
+    /*border-radius: 0 4px 4px 4px;*/
+    /*box-shadow: 2px 2px 5px rgba(0,0,0,0.1);*/
+    font-size: 1.5rem;
+    text-align: left;
+    margin: auto 0;
+    /*overflow-wrap: break-word;*/
+}
+
+#messages .timestamp{
+    font-size: 1.1rem;
+    text-align: right;
+    padding-top: 5px;
+    margin-bottom: -4px;
+    margin-right: -5px;
+}
+
 /*#endregion chat*/
 
-a { /* set style of a-links */
-    text-decoration: none;
-    color: black;
-}
 
-.selected{ /* set style of selected channel */
-    font-weight: bold;
-}
+/*a {*/
+/*    text-decoration: none;*/
+/*    color: black;*/
+/*}*/
 
-#header{ /* TU WhatsChat header */
+/*.selected{*/
+/*    font-weight: bold;*/
+/*} */
+
+#header{
+    /* TU WhatsChat header */
     background-color: #C50E1F;
     color: white;
     text-align: center;
     font-size: 2rem;
+    font-style: italic;
 }
 
-#footer{ /* copyright footer */
+#footer{
+    /* copyright footer */
     font-size: 1.5rem;
     text-align: center;
 }
