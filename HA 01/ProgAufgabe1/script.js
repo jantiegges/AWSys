@@ -176,6 +176,7 @@ function _getMessages(iChannelId, sOptions='') {
 }
 
 function _getUserList(iChannelId) {
+    // TODO: clear "old" user list so that only online users (10 minute rule) are displayed
     $.ajax({
         dataType: "json",
         url: String.format('{0}/channels/{1}/users', g_sServer, iChannelId),
