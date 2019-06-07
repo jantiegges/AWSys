@@ -3,8 +3,9 @@ var g_curChannel = -1; // not set
 var g_sLastSeen = "";
 // global const settings
 const g_iDebugMsg = 1; // 0 - off, 1 - unstable, 2 - all
-const g_iRefreshChannels = 10000*6;
-const g_iRefreshMsgs = 1000*10;
+const g_iRefreshChannels = 1000*60;
+const g_iRefreshMsgs = 1000*2;
+const g_iRefreshUsers = 1000*10;
 const g_sToken = "qdgOjossrOiE";
 const g_sServer = "http://34.243.3.31:8080";
 // store user and channel list since we will be accessing it frequently in different funcs
@@ -14,6 +15,7 @@ const g_sChannelList = "#channels .channel-name p";
 $( document ).ready(function() {
 
     _getChannels(); // load existing channels
+    _getUserList(g_curChannel);
     //$("#chat-screen .write-msg textarea").focus(); // set focus to message input
 
     $("#channels i").click(function () { // user added a channel
@@ -27,9 +29,12 @@ $( document ).ready(function() {
 
         // check if channel can be added (not exists and not empty)
         if (sNewChannel !== '' && !_containsElem(g_sChannelList, sNewChannel)) {
+            _createNewChannel(sNewChannel,sNewTopic);
             // TODO: <click on add channel> first we need to create the channel on the server in order to get its ID
             // _addChannelToScreen(iID??????, sNewChannel, sNewTopic); // add channel
-        } else console.error(String.format("Channel '{0}' already exists!", sNewChannel));
+        } else{
+            console.error(String.format("Channel '{0}' already exists!", sNewChannel));
+        }
         // clear input fields
         oCName.val('');
         oCTopic.val('');
@@ -40,8 +45,6 @@ $( document ).ready(function() {
         let tmp = o.val(); // read new username
         if (tmp === '') return;
         g_sUsername = tmp; // username ok -> update
-        if (!_containsElem(g_sUserList, g_sUsername)) // TODO: only add to userlist when server says we are in the channel (since we wrote something)
-            _addUserToScreen(g_sUsername);
         // clear and update input:
         o.val('');
         o.attr('placeholder', g_sUsername);
@@ -65,8 +68,9 @@ $( document ).ready(function() {
     });
 
     // set timers for background poll funcs
-    setTimeout(_updateChannelList, g_iRefreshChannels);
-    setTimeout(_updateMessageList, g_iRefreshMsgs);
+    setInterval(_updateChannelList, g_iRefreshChannels);
+    setInterval(_updateMessageList, g_iRefreshMsgs);
+    setInterval(_updateUserList, g_iRefreshUsers);
     // TODO: jede min check ob user offline
 });
 
@@ -74,15 +78,19 @@ $( document ).ready(function() {
 //#region poll funcs
 function _updateChannelList() {
     _getChannels(); // update channel list
-    setTimeout(_updateChannelList, g_iRefreshChannels); // reschedule call
+    
 }
 
 function _updateMessageList() {
-    if (g_curChannel === -1 || g_sLastSeen === '') return false; // not in a channel yet
+    console.log("Update Messages"+g_curChannel+g_sLastSeen);
+    if (g_curChannel === -1) return false; // not in a channel yet
     _getMessages(g_curChannel, '?lastSeenTimestamp='+encodeURIComponent(g_sLastSeen));
-    setTimeout(_updateMessageList, g_iRefreshMsgs); // reschedule call
 }
 
+function _updateUserList() {
+    if (g_curChannel === -1 || g_sLastSeen === '') return false;
+    _getUserList(g_curChannel);
+}
 //#endregion background poll funcs
 
 
@@ -105,9 +113,30 @@ function _sendMsg(sMsg, sSender) {
         Erfolgreich an den Server gesendete Nachrichten sollen direkt nach dem Senden an die bereits vorliegenden Nachrichten
         im Nachrichtenfenster angehängt werden.
      */
+     $.ajax({
+        
+        url: g_sServer+"/channels/"+g_curChannel+"/messages",
+        type:"POST",
+        headers: {
+            'X-Group-Token': g_sToken ,
+            'Content-Type':'application/json'
+        },
+        data:  JSON.stringify({'creator': sSender,
+            'content': sMsg}),
+        dataType: "json",
+        success: function (){
+            if (g_iDebugMsg >= 2) console.log(String.format("Messages was sent; Message: {0}, User: {1}", sMsg, sSender));
+            _getUserList(g_curChannel);
+            _getMessages(g_curChannel,'?lastSeenTimestamp='+encodeURIComponent(g_sLastSeen));
+        },
+
+
+
+     });
+
 
     // add us to online list if not in there yet
-    if (!_containsElem(g_sUserList, sSender)) _addUserToScreen(sSender);
+    if (!_containsElem(g_sUserList, sSender)) _getUserList(g_curChannel);
 }
 
 function _createNewChannel(sChannel, sTopic) {
@@ -118,6 +147,28 @@ function _createNewChannel(sChannel, sTopic) {
         Serverseitig entspricht dies dem Anlegen einer neuen Channel-Ressource.
      */
     // return iID!! OR: _addChannelToScreen mit ID bei async func
+
+    $.ajax({
+        
+        url: g_sServer+"/channels",
+        type:"POST",
+        headers: {
+            'X-Group-Token': g_sToken ,
+            'Content-Type':'application/json'
+        },
+        data:  JSON.stringify({'name': sChannel,
+            'topic': sTopic}),
+        dataType: "json",
+        success: function (data){
+            if (g_iDebugMsg >= 2) console.log(String.format("Channel was created; Channel name: {0}, Channel topic: {1}", sChannel, sTopic));
+            _getChannels();
+            _idChannel = data.id;
+            _switchChannel(_idChannel);
+        },
+
+
+
+     });
 }
 
 function _getChannels(sPage='/channels?page=0&size=500') {
@@ -151,6 +202,7 @@ function _getChannels(sPage='/channels?page=0&size=500') {
 
 function _getMessages(iChannelId, sOptions='') {
     let sPage = String.format("/channels/{0}/messages{1}", iChannelId, sOptions);
+    let currtimestamp = "";
     if (g_iDebugMsg >= 2) console.log('Msg-Page: '+sPage);
     let bNewMsg = false; // reduce traffic by only updating user list when we received a message
     $.ajax({
@@ -165,19 +217,34 @@ function _getMessages(iChannelId, sOptions='') {
             $.each(data, function (index, val) {
                 // add channel from given server list to local channel list
                     if (g_iDebugMsg >= 2) console.log(String.format("[{0}] - {1}: {2}", val.timestamp, val.creator, val.content));
-                    if (index === 0) g_sLastSeen = val.timestamp; // our first element is the latest one -> update lastseen timestamp
-                    if (sOptions === '' || index > 0){ // Options set -> first entry is the msg we already have -> skip it
+                    if(index === 0) currtimestamp = val.timestamp;
+                    if(g_sLastSeen ===val.timestamp){ // our element is the latest one we have in the chat
+                        g_sLastSeen = currtimestamp;
+                        return;
+                    } 
+                    if (index === 0 && g_sLastSeen !==val.timestamp) currtimestamp = val.timestamp;
+                    if (sOptions === ''){ // Options set -> first entry is the msg we already have -> skip it
                         _addMsgToScreen(val.content, val.creator, new Date(val.timestamp), true);
-                        bNewMsg = true
+                        bNewMsg = true;
+                    }
+                    if (sOptions !== '' ){
+                        _addMsgToScreen(val.content, val.creator, new Date(val.timestamp), false);
+                        bNewMsg = true;
                     }
             });
             if (bNewMsg) _getUserList(iChannelId); // update userList once
+            g_sLastSeen = currtimestamp;
         }
     });
 }
 
 function _getUserList(iChannelId) {
     // TODO: clear "old" user list so that only online users (10 minute rule) are displayed
+    if(iChannelId === -1) return;
+    var list = document.getElementById("userslist");
+    while(list.hasChildNodes()){
+        list.removeChild(list.childNodes[0]);
+    }
     $.ajax({
         dataType: "json",
         url: String.format('{0}/channels/{1}/users', g_sServer, iChannelId),
@@ -188,7 +255,8 @@ function _getUserList(iChannelId) {
             // if (g_iDebugMsg >= 2) console.log(String.format("[{0}] ", raw));
             $.each(raw, function (index, val) {
                 if (g_iDebugMsg >= 2) console.log(String.format("[{0}] User: {1}", index, val));
-                if (!_containsElem(g_sUserList, val)) _addUserToScreen(val);
+                //if (!_containsElem(g_sUserList, val)) 
+                _addUserToScreen(val);
             });
         }
     });
@@ -207,7 +275,6 @@ function _addMsgToScreen(sMsg, sSender, timestamp = new Date(), bReverse = false
                          sSender - Sender as string
             Returns:     Nothing.
          */
-
     let sTime = timestamp.toLocaleString();
     if (sMsg === '' || sSender === '') return;// let sAddString = "<article><div class='user'><p>" + sSender + ":</p></div><div class='msg'><div class='inner-msg'><p>"+ sMsg +"</p></div><div class='timestamp'><p>"+sTime+"</p></div></div></article>";
     let sAddString = String.format("<article><div class='user'><p>{0}:</p></div><div class='msg'><div class='inner-msg'><p>{1}</p></div><div class='timestamp'><p>{2}</p></div></div></article>", sSender, sMsg, sTime);
@@ -224,7 +291,8 @@ function _addMsgToScreen(sMsg, sSender, timestamp = new Date(), bReverse = false
 function _addUserToScreen(sUsername) {
     if (sUsername === '') return;
     let sAddString = String.format("<li><div class='user-list'><div class='user-name'><p>{0}</p></div></div></li>", sUsername);
-    $("#users ul").append(sAddString);
+    var h = document.getElementById("userslist");
+    h.insertAdjacentHTML('beforeend',sAddString);
 }
 
 function _addChannelToScreen(iID, sChannel, sTopic = ''){
@@ -254,6 +322,9 @@ function _switchChannel(sChannel) {
     _clearChatScreen();
     _getMessages(iChannelId);
     g_curChannel = iChannelId;
+
+    // show channel users
+    _getUserList(g_curChannel);
 }
 
 function _prepChannelName(sChannel) {
@@ -310,7 +381,7 @@ function _inputHelper_ReadTextarea() {
     let o = $("#chat-screen .write-msg textarea");
     let sMsg = o.val(); // read msg from input field
     if (sMsg === '') return;
-    _addMsgToScreen(sMsg, g_sUsername);
+    _sendMsg(sMsg, g_sUsername);
     o.val(''); // clear msg field
 }
 
