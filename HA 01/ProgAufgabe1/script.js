@@ -68,7 +68,7 @@ $( document ).ready(function() {
     });
 
     // set timers for background poll funcs
-    setInterval(_updateChannelList, g_iRefreshChannels);
+    setInterval(_getChannels, g_iRefreshChannels);
     setInterval(_updateMessageList, g_iRefreshMsgs);
     setInterval(_updateUserList, g_iRefreshUsers);
     // TODO: jede min check ob user offline
@@ -76,11 +76,6 @@ $( document ).ready(function() {
 
 
 //#region poll funcs
-function _updateChannelList() {
-    _getChannels(); // update channel list
-    
-}
-
 function _updateMessageList() {
     console.log("Update Messages"+g_curChannel+g_sLastSeen);
     if (g_curChannel === -1) return false; // not in a channel yet
@@ -165,9 +160,6 @@ function _createNewChannel(sChannel, sTopic) {
             _idChannel = data.id;
             _switchChannel(_idChannel);
         },
-
-
-
      });
 }
 
