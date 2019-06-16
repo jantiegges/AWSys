@@ -1,10 +1,10 @@
 var g_sUsername = "anonymous"; // set default username
-var g_curChannel = -1; // not set
+var g_iCurChannel = -1; // not set
 var g_sLastSeen = "";
 // global const settings
 const g_iDebugMsg = 1; // 0 - off, 1 - unstable, 2 - all
 const g_iRefreshChannels = 1000*60;
-const g_iRefreshMsgs = 1000*2;
+const g_iRefreshMsgs = 1000;
 const g_iRefreshUsers = 1000*10;
 const g_sToken = "qdgOjossrOiE";
 const g_sServer = "http://34.243.3.31:8080";
@@ -13,9 +13,8 @@ const g_sUserList = "#users .user-list .user-name p";
 const g_sChannelList = "#channels .channel-name p";
 
 $( document ).ready(function() {
-
     _getChannels(); // load existing channels
-    _getUserList(g_curChannel);
+    _getUserList(g_iCurChannel);
     //$("#chat-screen .write-msg textarea").focus(); // set focus to message input
 
     $("#channels i").click(function () { // user added a channel
@@ -30,8 +29,6 @@ $( document ).ready(function() {
         // check if channel can be added (not exists and not empty)
         if (sNewChannel !== '' && !_containsElem(g_sChannelList, sNewChannel)) {
             _createNewChannel(sNewChannel,sNewTopic);
-            // TODO: <click on add channel> first we need to create the channel on the server in order to get its ID
-            // _addChannelToScreen(iID??????, sNewChannel, sNewTopic); // add channel
         } else{
             console.error(String.format("Channel '{0}' already exists!", sNewChannel));
         }
@@ -71,21 +68,22 @@ $( document ).ready(function() {
     setInterval(_getChannels, g_iRefreshChannels);
     setInterval(_updateMessageList, g_iRefreshMsgs);
     setInterval(_updateUserList, g_iRefreshUsers);
-    // TODO: jede min check ob user offline
 });
 
 
 //#region poll funcs
 function _updateMessageList() {
-    console.log("Update Messages"+g_curChannel+g_sLastSeen);
-    if (g_curChannel === -1) return false; // not in a channel yet
-    _getMessages(g_curChannel, '?lastSeenTimestamp='+encodeURIComponent(g_sLastSeen));
+    console.log("Update Messages"+g_iCurChannel+g_sLastSeen);
+    if (g_iCurChannel === -1) return false; // not in a channel yet
+    _getMessages(g_iCurChannel, '?lastSeenTimestamp='+encodeURIComponent(g_sLastSeen));
 }
 
 function _updateUserList() {
-    if (g_curChannel === -1 || g_sLastSeen === '') return false;
-    _getUserList(g_curChannel);
+    if (g_iCurChannel === -1 || g_sLastSeen === '') return false;
+    _getUserList(g_iCurChannel);
 }
+
+
 //#endregion background poll funcs
 
 
@@ -99,18 +97,8 @@ function _updateUserList() {
 
 //#region server funcs
 function _sendMsg(sMsg, sSender) {
-    /*
-        TODO: send Msg to server
-        Der Nutzer soll Nachrichten verfassen und diese in dem beigetretenen Channel veröffentlichen können.
-        Eine Nachricht besteht aus Nachrichtentext („content“), Autor („creator“), einem Zeitstempel und ist einem Channel zugeordnet.
-        Autor und Channel sind dabei vorbestimmt durch den Channel, dem der Nutzer im Moment mit einem Nutzernamen beigetreten ist.
-        Der Zeitstempel einer Nachricht wird Serverseitig festgelegt, sobald die Nachricht an den Server gesendet wurde.
-        Erfolgreich an den Server gesendete Nachrichten sollen direkt nach dem Senden an die bereits vorliegenden Nachrichten
-        im Nachrichtenfenster angehängt werden.
-     */
      $.ajax({
-        
-        url: g_sServer+"/channels/"+g_curChannel+"/messages",
+        url: g_sServer+"/channels/"+g_iCurChannel+"/messages",
         type:"POST",
         headers: {
             'X-Group-Token': g_sToken ,
@@ -121,28 +109,15 @@ function _sendMsg(sMsg, sSender) {
         dataType: "json",
         success: function (){
             if (g_iDebugMsg >= 2) console.log(String.format("Messages was sent; Message: {0}, User: {1}", sMsg, sSender));
-            _getUserList(g_curChannel);
-            _getMessages(g_curChannel,'?lastSeenTimestamp='+encodeURIComponent(g_sLastSeen));
+            _getUserList(g_iCurChannel); // update user list
+            _getMessages(g_iCurChannel,'?lastSeenTimestamp='+encodeURIComponent(g_sLastSeen));
         },
-
-
-
      });
-
-
     // add us to online list if not in there yet
-    if (!_containsElem(g_sUserList, sSender)) _getUserList(g_curChannel);
+    if (!_containsElem(g_sUserList, sSender)) _getUserList(g_iCurChannel);
 }
 
 function _createNewChannel(sChannel, sTopic) {
-    /*
-        TODO: create channel (on server)
-        Nutzer sollen Channels mit entsprechendem Namen erstellen können.
-        Channels sind Chatgruppen. Jeder Channel hat ein Thema („topic“), das den Channel neben dem Namen charakterisiert.
-        Serverseitig entspricht dies dem Anlegen einer neuen Channel-Ressource.
-     */
-    // return iID!! OR: _addChannelToScreen mit ID bei async func
-
     $.ajax({
         
         url: g_sServer+"/channels",
@@ -231,12 +206,12 @@ function _getMessages(iChannelId, sOptions='') {
 }
 
 function _getUserList(iChannelId) {
-    // TODO: clear "old" user list so that only online users (10 minute rule) are displayed
     if(iChannelId === -1) return;
     var list = document.getElementById("userslist");
     while(list.hasChildNodes()){
         list.removeChild(list.childNodes[0]);
     }
+
     $.ajax({
         dataType: "json",
         url: String.format('{0}/channels/{1}/users', g_sServer, iChannelId),
@@ -247,7 +222,7 @@ function _getUserList(iChannelId) {
             // if (g_iDebugMsg >= 2) console.log(String.format("[{0}] ", raw));
             $.each(raw, function (index, val) {
                 if (g_iDebugMsg >= 2) console.log(String.format("[{0}] User: {1}", index, val));
-                //if (!_containsElem(g_sUserList, val)) 
+                if (!_containsElem(g_sUserList, val))
                 _addUserToScreen(val);
             });
         }
@@ -260,15 +235,16 @@ function _getUserList(iChannelId) {
 //#region local funcs
 
 function _addMsgToScreen(sMsg, sSender, timestamp = new Date(), bReverse = false) {
-        /*
-            Function:    _addMsgToScreen
-            Description: Adds an element (message + sender) to the chat window
-            Params:      sMsg    - Message as string
-                         sSender - Sender as string
-            Returns:     Nothing.
-         */
+    /*
+        Function:    _addMsgToScreen
+        Description: Adds an element (message + sender) to the chat window
+        Params:      sMsg    - Message as string
+                     sSender - Sender as string
+        Returns:     Nothing.
+    */
     let sTime = timestamp.toLocaleString();
-    if (sMsg === '' || sSender === '') return;// let sAddString = "<article><div class='user'><p>" + sSender + ":</p></div><div class='msg'><div class='inner-msg'><p>"+ sMsg +"</p></div><div class='timestamp'><p>"+sTime+"</p></div></div></article>";
+    if (sMsg === '' || sSender === '') return;
+    // let sAddString = "<article><div class='user'><p>" + sSender + ":</p></div><div class='msg'><div class='inner-msg'><p>"+ sMsg +"</p></div><div class='timestamp'><p>"+sTime+"</p></div></div></article>";
     let sAddString = String.format("<article><div class='user'><p>{0}:</p></div><div class='msg'><div class='inner-msg'><p>{1}</p></div><div class='timestamp'><p>{2}</p></div></div></article>", sSender, sMsg, sTime);
     let oMsg = $("#chat-screen #messages");
     if (bReverse) { // when loading messages from server we get the newest element first -> reverse adding order
@@ -313,10 +289,10 @@ function _switchChannel(sChannel) {
     // show channel messages
     _clearChatScreen();
     _getMessages(iChannelId);
-    g_curChannel = iChannelId;
+    g_iCurChannel = iChannelId;
 
     // show channel users
-    _getUserList(g_curChannel);
+    _getUserList(g_iCurChannel);
 }
 
 function _prepChannelName(sChannel) {
