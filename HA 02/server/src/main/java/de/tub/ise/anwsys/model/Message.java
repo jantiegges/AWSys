@@ -3,12 +3,10 @@ package de.tub.ise.anwsys.model;
 import de.tub.ise.anwsys.model.Channels;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashSet;
-import javax.persistence.ManyToOne;
-import javax.persistence.JoinColumn;
 import java.util.*;
+import java.sql.Timestamp;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+
 
 @Entity
 public class Message {
@@ -20,6 +18,8 @@ public class Message {
     private String content;
     @Column(name = "Channel_Id")
     private long channelId;
+    //@JsonUnwrapped
+    //private final Resources<EmbeddedWrapper> embeddeds;
 
     public Message(){
     }
