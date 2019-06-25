@@ -11,12 +11,13 @@ public class Channels {
 
     @Id
     @GeneratedValue
+    @OneToMany(mappedBy = "channelId")
     private long id;
 
     private String name;
     private String topic;
-    @OneToMany(mappedBy = "channel")
-    private LinkedList<Message> messages;
+    //@OneToMany(mappedBy = "channel")
+    //private LinkedList<Message> messages;
 
 
     public Channels(){

@@ -57,11 +57,12 @@ public class HelloController {
         m.setTimestamp();
         m.setContent(message.getContent());
         m.setCreator(message.getCreator());
-        Channels c = new Channels();
-        if(id >0) {
-            c = channelsRepository.findById(id).get();
-            m.setChannel(c);
-        }
+        m.setChannelId(id);
+        //Channels c = new Channels();
+        //if(id >0) {
+        //    c = channelsRepository.findById(id).get();
+        //    m.setChannel(c);
+        //}
 
         return ResponseEntity.ok(m);
     }

@@ -5,6 +5,8 @@ import de.tub.ise.anwsys.model.Channels;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
 
 @Entity
 public class Message {
@@ -15,8 +17,8 @@ public class Message {
     private String content;
     private String creator;
     @ManyToOne
-    @JoinColumn(name = "id", nullable=false)
-    private Channels channel;
+    @JoinColumn(name = "CHANNEL_ID", nullable=false)
+    private long channelId;
 
     public Message(){}
     //*************************************
@@ -25,7 +27,7 @@ public class Message {
     public Timestamp getTimestamp(){return timestamp;}
     public String getContent(){return content;}
     public String getCreator(){return creator;}
-    public Channels getChannels(){ return channel;}
+    public long getChannelId(){ return channelId;}
 
     public void setTimestamp(){
         Date date = new Date();
@@ -33,6 +35,6 @@ public class Message {
     }
     public void setContent(String content){this.content = content;}
     public void setCreator(String creator){this.creator = creator;}
-    public void setChannel(Channels channel){this.channel = channel;}
+    public void setChannelId(long channelId){this.channelId = channelId;}
     //**************************************
 }
