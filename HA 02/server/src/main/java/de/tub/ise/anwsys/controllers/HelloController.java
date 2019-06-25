@@ -18,7 +18,7 @@ public class HelloController {
     public HelloController(ChannelsRepository channelsRepository){
         this.channelsRepository = channelsRepository;
     }
-
+/*
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
     public ResponseEntity<?> getHelloWorld(@RequestParam(name = "me", required = false) String me) {
         if ((me == null) || me.isEmpty()) {
@@ -26,7 +26,7 @@ public class HelloController {
         }
         return ResponseEntity.ok(String.format("Hello, %s!", me));
     }
-
+*/
     @RequestMapping(value = "/leo", method = RequestMethod.GET, produces = "text/html")
     public String mapToMyName (){
         return "Leonard Kinzinger";
@@ -57,9 +57,12 @@ public class HelloController {
         m.setTimestamp();
         m.setContent(message.getContent());
         m.setCreator(message.getCreator());
-        Channels q = new Channels();
-        //q = channelsRepository.findById(id);
-        //m.setChannel(q);
+        Channels c = new Channels();
+        if(id >0) {
+            c = channelsRepository.findById(id).get();
+            m.setChannel(c);
+        }
+
         return ResponseEntity.ok(m);
     }
 
