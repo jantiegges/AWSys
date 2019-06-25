@@ -17,8 +17,10 @@ public class HelloController {
     ChannelsRepository channelsRepository;
     MessageRepository messageRepository;
 
-    public HelloController(ChannelsRepository channelsRepository){
+    public HelloController(ChannelsRepository channelsRepository, MessageRepository messageRepository){
+
         this.channelsRepository = channelsRepository;
+        this.messageRepository = messageRepository;
     }
 /*
     @RequestMapping(method = RequestMethod.GET, produces = "text/html")
@@ -60,7 +62,7 @@ public class HelloController {
         m.setCreator(message.getCreator());
         m.setContent(message.getContent());
         m.setChannelId(id);
-        //messageRepository.save(m);
+        messageRepository.save(m);
 
 
         //return ResponseEntity.ok(m);
