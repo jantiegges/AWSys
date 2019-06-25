@@ -4,28 +4,43 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import java.util.*;
+import javax.persistence.CascadeType;
 import java.util.LinkedList;
+import javax.persistence.*;
 
 @Entity
 public class Channels {
-
-    @Id
-    @GeneratedValue
-    @OneToMany(mappedBy = "channelId")
+//************* Attribute ******************
     private long id;
 
     private String name;
+
     private String topic;
-    //@OneToMany(mappedBy = "channel")
-    //private LinkedList<Message> messages;
 
-
+    private List <Message> messages = new LinkedList<>();
+//************* Konstruktor *****************
     public Channels(){
     }
+//************* GETTER & SETTER *************
+    @Id
+    @GeneratedValue
+    public long getId(){ return id;}
 
     public String getName(){ return name; }
+
     public String getTopic(){ return topic;}
-    public long getId(){ return id; }
+
+    @OneToMany(targetEntity = de.tub.ise.anwsys.model.Message.class, cascade = CascadeType.ALL, mappedBy = "channelId")
+    //@JoinColumn(name="Channel_Identifier")
+    public List<Message> getMessages(){
+        if(messages == null) return null;
+        else return messages;
+    }
+
+    public void setId (long id){
+        this.id = id;
+    }
 
     public void setName(String name){
         this.name = name;
@@ -35,8 +50,7 @@ public class Channels {
         this.topic = topic;
     }
 
-
-
-
-
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
 }

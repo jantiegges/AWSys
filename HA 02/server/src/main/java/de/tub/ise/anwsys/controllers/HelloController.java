@@ -2,6 +2,7 @@ package de.tub.ise.anwsys.controllers;
 
 import de.tub.ise.anwsys.model.Message;
 import de.tub.ise.anwsys.repositories.ChannelsRepository;
+import de.tub.ise.anwsys.repositories.MessageRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import de.tub.ise.anwsys.model.Channels;
@@ -14,6 +15,7 @@ import java.util.LinkedList;
 public class HelloController {
 
     ChannelsRepository channelsRepository;
+    MessageRepository messageRepository;
 
     public HelloController(ChannelsRepository channelsRepository){
         this.channelsRepository = channelsRepository;
@@ -36,7 +38,7 @@ public class HelloController {
         Channels c = new Channels();
         c.setName(channel.getName());
         c.setTopic(channel.getTopic());
-        c = channelsRepository.save(channel);
+        channelsRepository.save(c);
         return ResponseEntity.ok(c);
     }
 
@@ -55,17 +57,20 @@ public class HelloController {
     public ResponseEntity<?> sendMessage(@RequestBody Message message, @PathVariable("id") long id){
         Message m = new Message();
         m.setTimestamp();
-        m.setContent(message.getContent());
         m.setCreator(message.getCreator());
+        m.setContent(message.getContent());
         m.setChannelId(id);
-        //Channels c = new Channels();
-        //if(id >0) {
-        //    c = channelsRepository.findById(id).get();
-        //    m.setChannel(c);
-        //}
+        //messageRepository.save(m);
 
+
+        //return ResponseEntity.ok(m);
         return ResponseEntity.ok(m);
     }
+    @RequestMapping(value = "/{id}/message", method = RequestMethod.GET)
+    public ResponseEntity<?> getMessages (@PathVariable("id") long id){
+        return ResponseEntity.ok(messageRepository.findAll());
+    }
+
 
 
 }
