@@ -1,11 +1,8 @@
 package de.tub.ise.anwsys.model;
 
-import de.tub.ise.anwsys.model.Channels;
-
 import javax.persistence.*;
 import java.util.*;
 import java.sql.Timestamp;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 
 @Entity
@@ -25,13 +22,11 @@ public class Message {
     }
     //*************************************
     // GETTER & SETTER METHODS
-    public long getId(){return id;}
-    public Timestamp getTimestamp(){return timestamp;}
-    public String getContent(){return content;}
-    public String getCreator(){return creator;}
-    public long getChannelId(){
-        return channelId;
-    }
+    public long getId(){ return id; }
+    public Timestamp getTimestamp(){ return timestamp; }
+    public String getContent(){ return content; }
+    public String getCreator(){ return creator; }
+    public long getChannelId(){ return channelId; }
 
     public void setTimestamp(){
         Date date = new Date();

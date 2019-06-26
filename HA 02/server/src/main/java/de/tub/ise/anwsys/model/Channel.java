@@ -10,33 +10,34 @@ import java.util.LinkedList;
 import javax.persistence.*;
 
 @Entity
-public class Channels {
+public class Channel {
 //************* Attribute ******************
-    private long id;
+    @Id
+    @GeneratedValue
+    private long id; // ID will be generated automatically
 
     private String name;
 
     private String topic;
 
-    private List <Message> messages = new LinkedList<>();
+//    private List <Message> messages = new LinkedList<>();
 //************* Konstruktor *****************
-    public Channels(){
+    public Channel(){
     }
 //************* GETTER & SETTER *************
-    @Id
-    @GeneratedValue
+
     public long getId(){ return id;}
 
     public String getName(){ return name; }
 
     public String getTopic(){ return topic;}
 
-    @OneToMany(targetEntity = de.tub.ise.anwsys.model.Message.class, cascade = CascadeType.ALL, mappedBy = "channelId")
-    //@JoinColumn(name="Channel_Identifier")
-    public List<Message> getMessages(){
-        if(messages == null) return null;
-        else return messages;
-    }
+//    @OneToMany(targetEntity = de.tub.ise.anwsys.model.Message.class, cascade = CascadeType.ALL, mappedBy = "channelId")
+//    @JoinColumn(name="Channel_Identifier")
+//    public List<Message> getMessages(){
+//        if(messages == null) return null;
+//        else return messages;
+//    }
 
     public void setId (long id){
         this.id = id;
@@ -50,7 +51,7 @@ public class Channels {
         this.topic = topic;
     }
 
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
-    }
+//    public void setMessages(List<Message> messages) {
+//        this.messages = messages;
+//    }
 }
