@@ -9,22 +9,31 @@ import javax.persistence.CascadeType;
 import java.util.LinkedList;
 import javax.persistence.*;
 
-@Entity
+@Entity // The Channel class is annotated with @Entity, indicating that it is a JPA entity. For lack of a @Table annotation, it is assumed that this entity will be mapped to a table named Channel.
 public class Channel {
-//************* Attribute ******************
+//  ************* Attribute ******************
+
     @Id
     @GeneratedValue
     private long id; // ID will be generated automatically
 
+    // Unannotated properties: it is assumed that they’ll be mapped to columns that share the same name as the properties themselves:
     private String name;
-
     private String topic;
-
 //    private List <Message> messages = new LinkedList<>();
-//************* Konstruktor *****************
-    public Channel(){
+
+
+//  ************* Konstruktor *****************
+
+    protected Channel(){} // "The default constructor only exists for the sake of JPA"
+
+    public Channel (String name, String topic) {
+        this.name = name;
+        this.topic = topic;
     }
-//************* GETTER & SETTER *************
+
+
+//  ************* GETTER & SETTER *************
 
     public long getId(){ return id;}
 
@@ -54,4 +63,9 @@ public class Channel {
 //    public void setMessages(List<Message> messages) {
 //        this.messages = messages;
 //    }
+
+    @Override
+    public String toString() {
+        return String.format("Channel(id=%d, Name='%s', Topic='%s')", id, name, topic);
+    }
 }

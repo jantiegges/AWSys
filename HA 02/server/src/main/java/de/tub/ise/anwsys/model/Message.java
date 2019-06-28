@@ -18,10 +18,20 @@ public class Message {
     //@JsonUnwrapped
     //private final Resources<EmbeddedWrapper> embeddeds;
 
-    public Message(){
+
+    protected Message(){} // for internal use only
+
+    public Message(String creator, String content, long channelId) {
+        Date date = new Date();
+        this.timestamp = new Timestamp(date.getTime());
+        this.creator = creator;
+        this.content = content;
+        this.channelId = channelId;
     }
+
     //*************************************
     // GETTER & SETTER METHODS
+
     public long getId(){ return id; }
     public Timestamp getTimestamp(){ return timestamp; }
     public String getContent(){ return content; }
@@ -35,5 +45,11 @@ public class Message {
     public void setContent(String content){this.content = content;}
     public void setCreator(String creator){this.creator = creator;}
     public void setChannelId(long channelId){this.channelId = channelId;}
+
+    @Override
+    public String toString() {
+        return String.format("Message(channelId=%d, timestamp=%s, creator='%s', content='%s')", channelId, timestamp.toString(), creator, content);
+    }
+
     //**************************************
 }

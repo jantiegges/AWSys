@@ -16,67 +16,51 @@ import java.util.LinkedList;
 @RequestMapping("/channels")
 public class ChatController {
 
-    ChannelRepository channelsRepository;
-    MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final MessageRepository messageRepository;
 
-    public ChatController(ChannelRepository channelsRepository, MessageRepository messageRepository){
-
-        this.channelsRepository = channelsRepository;
+    public ChatController(ChannelRepository channelRepository, MessageRepository messageRepository){
+        this.channelRepository = channelRepository;
         this.messageRepository = messageRepository;
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> createChannel(@RequestBody Channel channel){
-        Channel c = new Channel();
-        c.setName(channel.getName());
-        c.setTopic(channel.getTopic());
-        channelsRepository.save(c);
-        return ResponseEntity.ok(c);
+        channelRepository.save(channel); // save new channel object in database
+        return ResponseEntity.ok(channel);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public Resources<Resource<Channel>> getAllChannels() {
-        Iterator<Channel> iteratorC= channelsRepository.findAll().iterator();
+        Iterator<Channel> iteratorC = channelRepository.findAll().iterator();
         List<Resource<Channel>> channelList = new LinkedList<>();
         while(iteratorC.hasNext()){
-
-            Channel tmp = iteratorC.next();
-            channelList.add(new Resource<Channel>(tmp,
-            linkTo(methodOn(ChatController.class).getSpecificChannel(tmp.getId())).withSelfRel()));
+//            Channel tmp = iteratorC.next();
+//            channelList.add(new Resource<>(tmp, linkTo(methodOn(ChatController.class).getSpecificChannel(tmp.getId())).withSelfRel())); // adding links to each resource is not required in the api
+//            channelList.add(new Resource<>(tmp));
+            channelList.add(new Resource<>(iteratorC.next()));
         }
-
         return new Resources<>(channelList,linkTo(methodOn(ChatController.class).getAllChannels()).withSelfRel());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Resource<Channel> getSpecificChannel (@PathVariable("id") long id) {
-        Channel channel = channelsRepository.findById(id).get();
-        return new Resource<Channel>(channel,linkTo(methodOn(ChatController.class).getSpecificChannel(id)).withSelfRel());
-
-
-
+            Channel channel = channelRepository.findById(id).orElseThrow(() -> new ChannelNotFoundException(id)); // throw 404 if channel is not found
+            return new Resource<>(channel);
+            // this is also not as in the requirements API:
+//            Channel channel = channelRepository.findById(id).get();
+//            return new Resource<>(channel, linkTo(methodOn(ChatController.class).getSpecificChannel(id)).withSelfRel());
 }
 
     @RequestMapping(value = "/{id}/message", method = RequestMethod.POST)
     public ResponseEntity<?> sendMessage(@RequestBody Message message, @PathVariable("id") long id){
-        Message m = new Message();
-        m.setTimestamp();
-        m.setCreator(message.getCreator());
-        m.setContent(message.getContent());
-        m.setChannelId(id);
-        messageRepository.save(m);
-
-
-        //return ResponseEntity.ok(m);
-        return ResponseEntity.ok(m);
+        messageRepository.save(message);
+        return ResponseEntity.ok(message);
     }
     @RequestMapping(value = "/{id}/message", method = RequestMethod.GET)
     public ResponseEntity<?> getMessages (@PathVariable("id") long id){
         return ResponseEntity.ok(messageRepository.findAll());
     }
-
-
-
 }
 
 
