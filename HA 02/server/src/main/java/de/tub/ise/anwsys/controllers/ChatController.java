@@ -24,19 +24,6 @@ public class ChatController {
         this.channelsRepository = channelsRepository;
         this.messageRepository = messageRepository;
     }
-/*
-    @RequestMapping(method = RequestMethod.GET, produces = "text/html")
-    public ResponseEntity<?> getHelloWorld(@RequestParam(name = "me", required = false) String me) {
-        if ((me == null) || me.isEmpty()) {
-            return ResponseEntity.ok("Hello, world!");
-        }
-        return ResponseEntity.ok(String.format("Hello, %s!", me));
-    }
-*/
-    @RequestMapping(value = "/leo", method = RequestMethod.GET, produces = "text/html")
-    public String mapToMyName (){
-        return "Leonard Kinzinger";
-    }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> createChannel(@RequestBody Channel channel){
@@ -46,19 +33,16 @@ public class ChatController {
         channelsRepository.save(c);
         return ResponseEntity.ok(c);
     }
-//    @RequestMapping(method = RequestMethod.GET)
-//    public ResponseEntity<?> getAllChannels() {
-//
-//        return ResponseEntity.ok(channelsRepository.findAll());
-//    }
 
     @RequestMapping(method = RequestMethod.GET)
     public Resources<Resource<Channel>> getAllChannels() {
         Iterator<Channel> iteratorC= channelsRepository.findAll().iterator();
         List<Resource<Channel>> channelList = new LinkedList<>();
         while(iteratorC.hasNext()){
-            channelList.add(new Resource<Channel>(iteratorC.next(),
-            linkTo(methodOn(ChatController.class).getSpecificChannel(iteratorC.next().getId())).withSelfRel()));
+
+            Channel tmp = iteratorC.next();
+            channelList.add(new Resource<Channel>(tmp,
+            linkTo(methodOn(ChatController.class).getSpecificChannel(tmp.getId())).withSelfRel()));
         }
 
         return new Resources<>(channelList,linkTo(methodOn(ChatController.class).getAllChannels()).withSelfRel());
