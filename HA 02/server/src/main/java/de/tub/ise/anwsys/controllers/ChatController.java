@@ -53,12 +53,23 @@ public class ChatController {
 
     @RequestMapping(value = "/{id}/message", method = RequestMethod.POST)
     public ResponseEntity<?> sendMessage(@RequestBody Message message, @PathVariable("id") long id){
-        messageRepository.save(message);
-        return ResponseEntity.ok(message);
+        Message m = new Message();
+        m.setTimestamp();
+        m.setCreator(message.getCreator());
+        m.setContent(message.getContent());
+        m.setChannelId(id);
+        messageRepository.save(m);
+        return ResponseEntity.ok(m);
     }
     @RequestMapping(value = "/{id}/message", method = RequestMethod.GET)
     public ResponseEntity<?> getMessages (@PathVariable("id") long id){
+
         return ResponseEntity.ok(messageRepository.findAll());
+    }
+    @RequestMapping(value = "/{id}/users", method = RequestMethod.GET)
+    public List<?> getUsers(@PathVariable("id") long id){
+        List<String> userList = messageRepository.findUniqueCreatorByChannelId(id);
+        return userList;
     }
 }
 

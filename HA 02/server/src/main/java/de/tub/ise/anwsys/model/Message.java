@@ -17,7 +17,7 @@ public class Message {
     private long channelId;
 
 
-    protected Message(){} // for internal use only
+    public Message(){} // for internal use only
 
     public Message(String creator, String content, long channelId) {
         Date date = new Date();
