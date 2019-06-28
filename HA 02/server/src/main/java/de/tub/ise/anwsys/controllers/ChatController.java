@@ -3,6 +3,7 @@ package de.tub.ise.anwsys.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.*;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 import de.tub.ise.anwsys.model.Message;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import de.tub.ise.anwsys.model.Channel;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.LinkedList;
 
@@ -62,10 +65,25 @@ public class ChatController {
         return ResponseEntity.ok(m);
     }
     @RequestMapping(value = "/{id}/message", method = RequestMethod.GET)
-    public ResponseEntity<?> getMessages (@PathVariable("id") long id){
+    public PagedResources<?> getMessages (@PathVariable("id") long id,
+                                          Pageable pageable, PagedResourcesAssembler pagedResourcesAssembler,
+                                          @RequestParam(value = "lastSeenTimestamp", required = false)
+                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Optional<LocalDateTime> timestamp) {
 
-        return ResponseEntity.ok(messageRepository.findAll());
+        Page<Message> messagePage;
+
+        if (timestamp.isPresent()) {
+            LocalDateTime timestamp2 = timestamp.get();
+            //timestamp2 = timestamp2.plusMinutes(10);
+            messagePage = messageRepository.findMessagesByTimestamp(timestamp2, pageable);
+
+        } else {
+            messagePage = messageRepository.findAll(pageable);
+        }
+        PagedResources<?> pagedResources = pagedResourcesAssembler.toResource(messagePage, linkTo(ChatController.class).withSelfRel());
+        return pagedResources;
     }
+
     @RequestMapping(value = "/{id}/users", method = RequestMethod.GET)
     public List<?> getUsers(@PathVariable("id") long id){
         List<String> userList = messageRepository.findUniqueCreatorByChannelId(id);

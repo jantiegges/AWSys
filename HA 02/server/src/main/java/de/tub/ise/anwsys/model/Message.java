@@ -1,6 +1,7 @@
 package de.tub.ise.anwsys.model;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.sql.Timestamp;
 
@@ -10,7 +11,7 @@ public class Message {
     @Id
     @GeneratedValue
     private long id;
-    private Timestamp timestamp;
+    private LocalDateTime timestamp;
     private String creator;
     private String content;
     @Column(name = "Channel_Id")
@@ -21,7 +22,7 @@ public class Message {
 
     public Message(String creator, String content, long channelId) {
         Date date = new Date();
-        this.timestamp = new Timestamp(date.getTime());
+        this.timestamp = timestamp.now();
         this.creator = creator;
         this.content = content;
         this.channelId = channelId;
@@ -31,14 +32,14 @@ public class Message {
     // GETTER & SETTER METHODS
 
     public long getId(){ return id; }
-    public Timestamp getTimestamp(){ return timestamp; }
+    public LocalDateTime getLocalDateTime(){ return timestamp; }
     public String getContent(){ return content; }
     public String getCreator(){ return creator; }
     public long getChannelId(){ return channelId; }
 
     public void setTimestamp(){
         Date date = new Date();
-        this.timestamp = new Timestamp(date.getTime());
+        this.timestamp = LocalDateTime.now();
     }
     public void setContent(String content){this.content = content;}
     public void setCreator(String creator){this.creator = creator;}
