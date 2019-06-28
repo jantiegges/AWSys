@@ -1,5 +1,8 @@
 package de.tub.ise.anwsys.controllers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.*;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 import de.tub.ise.anwsys.model.Message;
@@ -31,25 +34,21 @@ public class ChatController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public Resources<Resource<Channel>> getAllChannels() {
-        Iterator<Channel> iteratorC = channelRepository.findAll().iterator();
-        List<Resource<Channel>> channelList = new LinkedList<>();
-        while(iteratorC.hasNext()){
-//            Channel tmp = iteratorC.next();
-//            channelList.add(new Resource<>(tmp, linkTo(methodOn(ChatController.class).getSpecificChannel(tmp.getId())).withSelfRel())); // adding links to each resource is not required in the api
-//            channelList.add(new Resource<>(tmp));
-            channelList.add(new Resource<>(iteratorC.next()));
-        }
-        return new Resources<>(channelList,linkTo(methodOn(ChatController.class).getAllChannels()).withSelfRel());
+    public PagedResources<?> getAllChannels(Pageable pageable, PagedResourcesAssembler pagedResourcesAssembler) {
+
+        Page<Channel> channelsPage = channelRepository.findAll(pageable);
+        PagedResources<?> pagedResources1 = pagedResourcesAssembler.toResource(channelsPage, linkTo(ChatController.class).withSelfRel());
+
+        return pagedResources1;
+
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Resource<Channel> getSpecificChannel (@PathVariable("id") long id) {
+    public Resource<?> getSpecificChannel (@PathVariable("id") long id) {
+
             Channel channel = channelRepository.findById(id).orElseThrow(() -> new ChannelNotFoundException(id)); // throw 404 if channel is not found
             return new Resource<>(channel);
-            // this is also not as in the requirements API:
-//            Channel channel = channelRepository.findById(id).get();
-//            return new Resource<>(channel, linkTo(methodOn(ChatController.class).getSpecificChannel(id)).withSelfRel());
+
 }
 
     @RequestMapping(value = "/{id}/message", method = RequestMethod.POST)
