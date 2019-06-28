@@ -20,7 +20,6 @@ public class Channel {
     // Unannotated properties: it is assumed that they’ll be mapped to columns that share the same name as the properties themselves:
     private String name;
     private String topic;
-//    private List <Message> messages = new LinkedList<>();
 
 
 //  ************* Konstruktor *****************

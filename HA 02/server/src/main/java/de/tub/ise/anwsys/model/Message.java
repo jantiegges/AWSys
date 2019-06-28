@@ -15,8 +15,6 @@ public class Message {
     private String content;
     @Column(name = "Channel_Id")
     private long channelId;
-    //@JsonUnwrapped
-    //private final Resources<EmbeddedWrapper> embeddeds;
 
 
     protected Message(){} // for internal use only
