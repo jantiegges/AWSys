@@ -1,6 +1,6 @@
-
 *.zip
 *.lnk
 .DS_Store
 .idea
 *.class
+target

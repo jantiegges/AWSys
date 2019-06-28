@@ -32,8 +32,9 @@ public class ChatController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> createChannel(@RequestBody Channel channel){
-        channelRepository.save(channel); // save new channel object in database
-        return ResponseEntity.ok(channel);
+        Channel c = new Channel(channel.getName(), channel.getTopic());
+        channelRepository.save(c); // save new channel object in database
+        return ResponseEntity.ok(c);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -54,17 +55,14 @@ public class ChatController {
 
 }
 
-    @RequestMapping(value = "/{id}/message", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}/messages", method = RequestMethod.POST)
     public ResponseEntity<?> sendMessage(@RequestBody Message message, @PathVariable("id") long id){
-        Message m = new Message();
-        m.setTimestamp();
-        m.setCreator(message.getCreator());
-        m.setContent(message.getContent());
-        m.setChannelId(id);
+        Message m = new Message(message.getCreator(), message.getContent(), id);
         messageRepository.save(m);
         return ResponseEntity.ok(m);
     }
-    @RequestMapping(value = "/{id}/message", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/{id}/messages", method = RequestMethod.GET)
     public PagedResources<?> getMessages (@PathVariable("id") long id,
                                           Pageable pageable, PagedResourcesAssembler pagedResourcesAssembler,
                                           @RequestParam(value = "lastSeenTimestamp", required = false)
