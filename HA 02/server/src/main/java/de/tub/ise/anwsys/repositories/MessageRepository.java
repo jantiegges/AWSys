@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface MessageRepository extends PagingAndSortingRepository<Message, Long>{
 
-    @Query("SELECT m.creator FROM Message AS m WHERE channelId = :channelId")
+    @Query("SELECT m.creator FROM Message AS m WHERE channelId = :channelId ORDER BY channelId DESC")
     List<String> findUniqueCreatorByChannelId(@Param("channelId") long channelId);
 
     @Query("SELECT m FROM Message AS m WHERE timestamp >= :lastSeenTimestamp")
