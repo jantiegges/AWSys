@@ -111,6 +111,8 @@ public class ChatController {
         if(!header.equals(token)) return ResponseEntity.status(401).build();
         List<String> userList = messageRepository.findUniqueCreatorByChannelId(id);
         return ResponseEntity.ok(userList);
+
+        //
     }
 }
 
