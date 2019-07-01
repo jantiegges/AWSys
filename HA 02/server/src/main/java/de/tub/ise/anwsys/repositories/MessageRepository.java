@@ -4,6 +4,7 @@ import de.tub.ise.anwsys.model.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -23,8 +24,9 @@ public interface MessageRepository extends PagingAndSortingRepository<Message, L
     @Query("SELECT m FROM Message AS m WHERE m.timestamp >= :lastSeenTimestamp AND m.channel.id = :channelId ORDER BY m.id DESC ")
     Page<Message> findMessagesByTimestamp(@Param("lastSeenTimestamp") Instant lastSeenTimestamp, Pageable pageable, long channelId);
 
-    @Query("SELECT m FROM Message  AS m WHERE m.channel.id = :channelId")
+    @Query("SELECT m FROM Message  AS m WHERE m.channel.id = :channelId ORDER BY m.timestamp DESC")
     Page<Message> findAllMessagesByChannel(Pageable pageable, long channelId);
+
 
 
 

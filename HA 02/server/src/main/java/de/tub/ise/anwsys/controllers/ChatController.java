@@ -3,6 +3,7 @@ package de.tub.ise.anwsys.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -72,19 +73,28 @@ public class ChatController {
     @RequestMapping(value = "/{id}/messages", method = RequestMethod.POST)
     public ResponseEntity<?> sendMessage(@RequestBody Message message,
                                          @PathVariable("id") long id,
-                                         @RequestHeader("X-Group-Token") String header){
-        if(!header.equals(token)) return ResponseEntity.status(401).build();
+                                         @RequestParam(value = "lastSeenTimestamp", required = false) Optional<Instant> timestamp,
+                                         Pageable pageable,
+                                         PagedResourcesAssembler pagedResourcesAssembler,
+                                         @RequestHeader("X-Group-Token") String header) {
+        if (!header.equals(token)) return ResponseEntity.status(401).build();
+
+        Page<Message> messagePage;
         Message m = new Message(message.getCreator(), message.getContent(), id, channelRepository.findById(id).get());
         messageRepository.save(m);
-        return ResponseEntity.ok(m);
-    }
+        if(timestamp.isPresent()) {
+            messagePage = messageRepository.findMessagesByTimestamp(timestamp.get(), pageable, id);
+            return ResponseEntity.ok(messagePage);
+        }else{ return ResponseEntity.ok(m);}
 
+
+    }
     @RequestMapping(value = "/{id}/messages", method = RequestMethod.GET)
     public ResponseEntity<?> getMessages (@PathVariable("id") long id,
                                           @RequestHeader("X-Group-Token") String header,
-                                          Pageable pageable, PagedResourcesAssembler pagedResourcesAssembler,
-                                          @RequestParam(value = "lastSeenTimestamp", required = false) Optional<Instant> timestamp
-                                          /*@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Optional<Instant> timestamp*/) {
+                                          PagedResourcesAssembler pagedResourcesAssembler,
+                                          @PageableDefault(size = 10) Pageable pageable,
+                                          @RequestParam(value = "lastSeenTimestamp", required = false) Optional<Instant> timestamp) {
 
         Page<Message> messagePage;
         //test
