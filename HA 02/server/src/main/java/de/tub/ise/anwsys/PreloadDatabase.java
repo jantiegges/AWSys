@@ -21,8 +21,8 @@ class PreloadDatabase {
         return args -> {
             System.out.println("Preloading " + channelRepository.save(new Channel("Preloaded Test Channel 1", "Test 1")));
             System.out.println("Preloading " + channelRepository.save(new Channel("Preloaded Test Channel 2", "Test 2")));
-            for (int i = 0; i<10;i++)
-                System.out.println("Preloading " + messageRepository.save(new Message("Creator", "Test Message "+i, 1, channelRepository.findById((long)1).get())));
+            //for (int i = 0; i<10;i++)
+                //System.out.println("Preloading " + messageRepository.save(new Message("Creator", "Test Message "+i, 1, channelRepository.findById((long)1).get())));
         };
     }
 

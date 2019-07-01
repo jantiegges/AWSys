@@ -1,6 +1,8 @@
 package de.tub.ise.anwsys.model;
 
 import javax.persistence.*;
+import java.sql.Time;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.sql.Timestamp;
@@ -11,32 +13,29 @@ public class Message {
     @Id
     @GeneratedValue
     private long id;
-    private LocalDateTime timestamp;
+    private Instant timestamp;
     private String creator;
     private String content;
-    //@Column(name = "Channel_Id")
-    //private long channelId;
     @ManyToOne(fetch = FetchType.EAGER)
-    //@JoinColumn(name = "channel_id")
     private Channel channel;
 
 
     public Message(){} // for internal use only
 
-    public Message(String creator, String content, long channelId, Channel channel) {
+    public Message(String creator, String content, long id, Channel channel) {
         Date date = new Date();
-        this.timestamp = timestamp.now();
+        this.timestamp = Instant.now();
+        System.out.println(timestamp.toString());
         this.creator = creator;
         this.content = content;
         this.channel = channel;
-        //this.channelId = channelId;
     }
 
     //*************************************
     // GETTER & SETTER METHODS
 
     public long getId(){ return id; }
-    public LocalDateTime getLocalDateTime(){ return timestamp; }
+    public Instant getTimestamp(){ return timestamp; }
     public String getContent(){ return content; }
     public String getCreator(){ return creator; }
     //public long getChannelId(){ return channelId; }
@@ -45,9 +44,8 @@ public class Message {
         return channel;
     }
 
-    public void setTimestamp(){
-        Date date = new Date();
-        this.timestamp = LocalDateTime.now();
+    public void setTimestamp(Instant timestamp){
+        this.timestamp = timestamp;
     }
     public void setContent(String content){this.content = content;}
     public void setCreator(String creator){this.creator = creator;}
@@ -61,8 +59,8 @@ public class Message {
     public String toString() {
         return String.format("Message(channelId=%d, timestamp=%s, creator='%s', content='%s')", timestamp.toString(), creator, content);
     }
+    */
 
-     */
 
     //**************************************
 }

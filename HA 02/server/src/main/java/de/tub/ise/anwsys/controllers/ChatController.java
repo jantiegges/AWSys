@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import de.tub.ise.anwsys.model.Channel;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.LinkedList;
@@ -80,20 +83,22 @@ public class ChatController {
     public ResponseEntity<?> getMessages (@PathVariable("id") long id,
                                           @RequestHeader("X-Group-Token") String header,
                                           Pageable pageable, PagedResourcesAssembler pagedResourcesAssembler,
-                                          @RequestParam(value = "lastSeenTimestamp", required = false)
-                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Optional<LocalDateTime> timestamp) {
+                                          @RequestParam(value = "lastSeenTimestamp", required = false) Optional<Instant> timestamp
+                                          /*@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Optional<Instant> timestamp*/) {
 
         Page<Message> messagePage;
         //test
         if(!header.equals(token)) return ResponseEntity.status(401).build();
         if (timestamp.isPresent()) {
-            LocalDateTime timestamp2 = timestamp.get();
+            Instant timestamp2 = timestamp.get();
+
             //timestamp2 = timestamp2.plusMinutes(10);
-            messagePage = messageRepository.findMessagesByTimestamp(timestamp2, pageable);
+            messagePage = messageRepository.findMessagesByTimestamp(timestamp2, pageable, id);
 
         } else {
+            messagePage = messageRepository.findAllMessagesByChannel(pageable,id);
+            //messagePage = messageRepository.findAll(PageRequest.of(0,10, Sort.Direction.DESC, "id"));
 
-            messagePage = messageRepository.findAll(PageRequest.of(0,10, Sort.Direction.DESC, "id"));
         }
         PagedResources<?> pagedResources = pagedResourcesAssembler.toResource(messagePage, linkTo(ChatController.class).withSelfRel());
         return ResponseEntity.ok(pagedResources);
